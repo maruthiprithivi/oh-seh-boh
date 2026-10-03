@@ -1,0 +1,13 @@
+{
+  "schema_version": "osb/1",
+  "scope": {"github_host": "github.com", "repository_id": "REPLACE_WITH_RESOLVED_ID", "repository_node_id": "REPLACE_WITH_RESOLVED_NODE_ID", "team_id": "example-team"},
+  "repository_url": "https://github.com/EXAMPLE/REPOSITORY",
+  "primary_owner": {"principal_id": "REPLACE_WITH_VERIFIED_HUMAN_ID", "display_login": "EXAMPLE"},
+  "delegates": [],
+  "mode": "github-cooperative",
+  "authority": {"epoch": 1, "contract_version": null, "endpoint": null, "credential_profile": "existing-user-auth", "capability_mapping": null, "client_or_gate_version": null},
+  "visibility": {"control_issue_url": "REPLACE_WITH_APPROVED_CONTROL_ISSUE", "project_url": null, "public_details_allowed": false},
+  "lease_policy": {"ttl_seconds": 900, "heartbeat_seconds": null, "heartbeat_trigger": "milestone-and-before-shared-write", "clock": "human-owner-advisory", "cooperative_expiry_requires_owner_review": true},
+  "permissions": {"participants": ["read", "request-claim", "own-heartbeat", "offer-handoff", "own-complete"], "primary_owner": ["acknowledge-claim", "revoke", "reconcile", "accept-completion"]},
+  "enforcement_boundary": "cooperative-agreement-only"
+}

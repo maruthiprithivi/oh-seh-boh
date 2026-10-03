@@ -1,0 +1,19 @@
+{
+  "setup_id": "example-setup-001",
+  "github_host": "github.com",
+  "repository_id": "10001",
+  "repository_node_id": "EXAMPLE_NODE_ID",
+  "repository_full_name": "EXAMPLE/REPOSITORY",
+  "team_id": "example-team",
+  "owner_id": "10002",
+  "owner_login": "EXAMPLE",
+  "task_id": "TASK-001",
+  "outcome": "Replace this with the approved concrete outcome",
+  "object_format": "sha1",
+  "base_oid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "head_oid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "advisory_ttl_seconds": 900,
+  "lease_policy": "Heartbeat at milestones; owner reviews expiry before reassignment",
+  "contact_route": "Replace with authorized human owner contact route",
+  "evidence_location": "Replace with approved private evidence destination"
+}

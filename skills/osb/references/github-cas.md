@@ -1,0 +1,21 @@
+# Dependency-light GitHub ledger branch
+
+Design option, not a shipped or tested backend. GitHub's `createCommitOnBranch` mutation creates a commit and advances the branch, requiring `expectedHeadOid` ([official reference](https://docs.github.com/en/graphql/reference/commits#createcommitonbranch)). This enables optimistic CAS of ledger state for compliant writers, unlike issue comment/label updates. `clientMutationId` is not a documented durable idempotency store; persist operation records in the ledger itself.
+
+An approved deterministic client must perform the following; an agent composing arbitrary JSON is not sufficient:
+
+1. Read repository identity, dedicated ledger ref/head and all state required for a decision **at that exact commit**. Validate contract, authenticated principal/session, epoch, generation/version, scope conflicts and allowed transition.
+2. Check persisted operation key/digest. If already committed return its receipt; changed payload conflicts. Construct updated task state, immutable event and operation receipt together. Canonicalize inputs consistently; never hash credentials.
+3. Submit all state/event/operation file changes in one `createCommitOnBranch` using that head OID. A CAS failure requires fresh read and transition validation; do not blindly reuse the winning state or overwrite it. Use at most two bounded retries with jitter/backoff, then return conflict/busy.
+4. On timeout read by operation key at the latest ledger head. If found and identical, recover committed result. If missing, retry same key through CAS only after rereading. Commit history alone is not sufficient if operation records were pruned.
+5. Project committed events to Issues after commit; track pending projection by event ID/version and reconcile duplicates after timeout. Never split the claim and its receipt into separate branch updates.
+
+One ledger branch is one atomic partition: distinct task files still contend on the branch head. Separate project branches can scale independent scopes but cannot atomically claim cross-project resources. A dedicated private coordination repository reduces interference with code branches, but changes destination/permissions and must be chosen explicitly. Restrict force-push/deletion and writer scope using approved repository policy; do not bypass existing rules to make the backend work.
+
+Time boundary: commit/API timestamps are observations, not a transactional lease clock that validates an arbitrary expiry predicate inside the CAS. In V1, branch-mode leases are advisory; workers stop at their conservative expiry and human owner authorizes revocation/reassignment after reconciliation. Do not reclaim automatically from a skewed client clock or treat heartbeat presence as proof the old worker stopped. A timed unattended lease engine requires a separately approved authoritative clock/validator; move to service mode when necessary.
+
+Trust boundary: Contents-write users may push or mutate state without the client. Signed commits verify authorship, not valid protocol transitions. CAS orders updates but does not make malicious/careless transitions safe. Without a privileged validating writer/broker and controlled access, label the mode `compliant-client-CAS`, not enforced ownership. Reject unexpected history rewrites, invalid generations, unknown events or owner changes and freeze the affected scope.
+
+External effects: ledger commit does not atomically merge a PR, push code, deploy, or publish an issue. Record effect intent and a stable effect ID, perform only authorized effects with their own supported idempotency/preconditions, then record result. On crash reconcile by that ID/resource revision before retrying. If the external system lacks suitable controls, require human review; never claim exactly-once effects.
+
+Suggested state layout for client implementation review: `scope.json`, `tasks/<opaque-id>.json`, `operations/<principal-scope>/<opaque-key>.json`, and immutable event shards plus projection checkpoints. Normalize/encode IDs to prevent path traversal; reject duplicate keys, oversized objects and scope changes. Bound active-state size; archive completed events under explicit retention policy while retaining generations/epoch and idempotency tombstones. Do not erase safety history to improve performance.
