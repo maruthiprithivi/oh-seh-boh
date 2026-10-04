@@ -16,6 +16,8 @@ The skill does not eliminate every code conflict. It helps teams notice overlapp
 
 **Status: source preview, unexecuted.** No runtime tests, stress runs, real agent harnesses or deployed authentication have been validated. This README reports capability of the supplied sources, not passing results.
 
+The [readiness audit](docs/readiness.md) separates reference behavior, actual authority, adapter and protected consumers. A [serial Linux validation job](validation/run.py) supplies exact-pin checks, actual PStack store acceptance, independent observations, mutation controls and predeclared profile gates. It requires an already admitted route and preprovisioned dependencies; it creates no infrastructure or access. [Operations](docs/operations.md) covers version binding, least authority, recovery and clean rollback. These sources remain unexecuted and do not establish production readiness.
+
 ## Use the skill
 
 Read [SKILL.md](skills/osb/SKILL.md) directly, or copy the full `skills/osb` folder into one approved skill root for your harness. See the [documented compatibility matrix](skills/osb/references/compatibility.md). Documentation support is separate from installed-version verification; `omp` and `agy` identities must be confirmed.

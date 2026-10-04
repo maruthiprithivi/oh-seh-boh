@@ -1,0 +1,18 @@
+{
+  "contract": "osb.validation-job.v1",
+  "authorized_disposable_linux": false,
+  "admitted_cpus": [],
+  "exclusive_existing_cgroup": "/sys/fs/cgroup/OPERATOR_ADMITTED_EXISTING_GROUP",
+  "source": "/approved/osb",
+  "source_commit": "61744a0850a2a9d6b843e22980973e9c3d3be44f",
+  "pstack": "/approved/pstack",
+  "pstack_commit": "5168f575f1ae6269850cb6dcd895e9b538bfc276",
+  "owner": "/approved/authority",
+  "owner_commit": "OPERATOR_SUPPLIED_FULL_COMMIT",
+  "owner_job": "/approved/owner-packet/validate-on-linux.sh",
+  "owner_job_sha256": "OPERATOR_VERIFIED_SCRIPT_SHA256",
+  "bun": "/approved/bin/bun",
+  "evidence": "/approved/evidence-unique",
+  "max_wall_seconds": 3600,
+  "load": {"agents": 8, "attempts_per_agent": 30, "seconds": 30, "min_ops_per_second": 1, "max_p99_seconds": 2, "min_fairness": 0.5}
+}

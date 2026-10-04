@@ -1,0 +1,31 @@
+# Operator deployment, recovery and rollback
+
+This is guidance for separately authorized setup of an existing compatible authority. It installs no service, key, account, app or hook. [Readiness gates](readiness.md) must be satisfied before any pilot; source review alone does not satisfy them.
+
+## Version and least-authority binding
+
+Keep wire, schema, adapter and implementation versions distinct. The local path requires pstack.osb.client.v1, mapping osb-firstmate.coord.project.v2, wire coord.project.v1, schema10 and profile firstmate.scoped.v2; discovery also matches the configured authority identity. Record exact tested OSB, PStack, authority, Python/Bun/dependency and route versions in an operator-owned capability map. An unknown/future schema/profile refuses. Do not relabel the lab's osb.lab.v1 as the real service, reinterpret experimental scoped-five DBs as schema10, or migrate/restore without the authority owner's approved procedure.
+
+For one team/repo, an administrator verifies immutable GitHub host/numeric repo identity and explicitly selects the primary. Give each human/agent home its own authenticated principal and private fixed endpoint route, scoped writer membership and separate durable journal. A forced command/API maps credentials to that principal; payload actor/principal/caller fields cannot choose it. Scope membership is not forge write/merge permission. Keep administrator/primary/invitation capabilities away from ordinary worker routes; separate reader projection credentials if projection is later approved. No shared credential/token in issues, prompts, claim capsules or source config. Use the existing secret/account system; never create credentials from this skill.
+
+The PStack verifier gets only an operator-fixed command and its fixed success verdict, read-only clean worktree and non-secret claim capsule. It must remain foreground in its owned process group, without remote work or detached children. It is trusted code, not sandboxed code. Keep the private initialized local store outside the checkout with one local writer. Keep durable run state/journal on owned private fsync-capable storage and a quota-limited log volume. Configure optional mode explicitly; absent/false/unrecognized binding refuses the optional action. Ordinary PStack stays available only through a deliberate operator workflow decision, not an automatic fail-open fallback during an opted-in action.
+
+## Observe and respond
+
+Retain exact source/authority/repo/home/session generation, request ID/payload digest, claim/fence, phase, revision, worker/verdict evidence, outcome and release status. Do not publish raw private logs/credentials. Alert on refused discovery, lost/repeated acknowledgments, stale generations, denied renewals, unexpected contention, long acquisition, unknown verdict effect, missing terminal state, unconfirmed release, non-quiescent process group, corrupt journal/store and threshold regressions. Observe projection failures separately from authoritative ownership. HTTP/CLI success, a historical grant or a GitHub label is insufficient permission to work.
+
+On an unavailable authority: stop initiating protected work, preserve immutable request/journal, and resume only by identical replay plus live reauthorization. Do not switch to a copied DB, cached grant, alternate account or cooperative issue label while keeping the original workflow's enforcement claim.
+
+On an uncertain claim response: retain acquiring; use the same route, binding, generation and original request key/body. If scope or authority identity changed, stop for operator reconciliation. Never generate a new key solely to escape uncertainty.
+
+On bound/running/publishing/terminal state: the runner refuses automatic relaunch. Preserve all state; prove owned process groups/remote work are quiescent, inspect current exact native claim plus local PR/head verdict and the immutable journal, then reconcile effect and release separately. A recorded verdict can coexist with a failed/unknown response. Never rerun a verifier/publisher just because the CLI returned nonzero. Release only the current authenticated holder's exact claim/fence; stale releases cannot remove a successor. A new session revokes a home's previous claims and is not routine resume or a cleanup shortcut.
+
+On SIGKILL/machine loss/lease expiry: the lease does not prove process death. Reconcile execution/effects before admitting overlapping work. Do not kill foreign processes, delete unknown worktrees or guess process identity from a stale PID. For detached/remote processes outside the supported path, use the responsible supervisor's identity/settlement procedure rather than claiming this runner can clean them up.
+
+On journal/disk failure or restore: freeze writes, keep the DB, journal, snapshots and receipts, and follow the authority owner's backup/recovery procedure. Test recovery rotates/bounds authority identity/fences, invalidates old grants and preserves acknowledged idempotency history. Never perform the reference lab's recovery on a real service or invent a successful authority migration. Treat a missing/corrupt observation as unknown, not zero effects.
+
+## Clean rollback
+
+Stop new opted-in dispatches first. Cancel/settle each known owned verifier/publisher and reconcile unknown effects; obtain exact release or owner-approved recovery evidence. Preserve journals, run state, DB snapshots and original request keys read-only. Do not delete the central ledger or reset sessions to simulate a clean rollback. Inspect actual local PR/head verdicts before deciding whether any record needs a separately authorized correction.
+
+After no unresolved occupied claims/effects remain, the named operator can disable the optional project path and return to ordinary PStack under its normal policy, with the limitation visible to users. Revoke only the extension's approved route/membership through existing admin controls if requested; no global harness config/key removal or broad privilege changes follow automatically. Rolling back source is not rolling back ledger epochs or durable history. Rehearse this sequence in the isolated test/pilot before production, retain evidence and define the responsible on-call operator and recovery-time/data-loss targets.
