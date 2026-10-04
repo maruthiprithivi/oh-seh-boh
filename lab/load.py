@@ -130,6 +130,8 @@ def inspect_invariants(db, results):
             violations.append("unauthorized-protected-write")
         writes = connection.execute("SELECT count(*) FROM protected_writes").fetchone()[0]
         protected_failures = sum(r["reasons"].get("protected-effect-failed", 0) for r in results)
+        if protected_failures:
+            violations.append("protected-effect-failure")
     return {"double_ownership": double, "lost_acknowledged_transitions": lost,
             "protected_writes": writes, "protected_effect_failures": protected_failures,
             "unauthorized_protected_writes": unauthorized,

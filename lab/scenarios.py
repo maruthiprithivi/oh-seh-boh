@@ -211,6 +211,26 @@ class Correctness(unittest.TestCase):
             "resources": [{"type": "file", "name": "other"}]})["reason"], "backpressure")
         self.assertTrue(self.f.call("alice", "release", {"task": "task", "fence": grant["fence"]})["ok"])
 
+    def test_backpressured_protected_effect_fails_profile_qualification(self):
+        from load import inspect_invariants
+
+        self.f.intent()
+        grant = self.f.claim()
+        with sqlite3.connect(self.f.path) as db:
+            db.execute("UPDATE meta SET value='1' WHERE key='max_pending'")
+        refused = self.f.call("alice", "protected-write", {
+            "task": "task", "fence": grant["fence"], "base": BASE, "head": HEAD,
+            "content": {"synthetic": "full-projection"}})
+        self.assertFalse(refused["ok"])
+        self.assertEqual(refused["reason"], "backpressure")
+        self.assertTrue(self.f.call("alice", "release", {"task": "task", "fence": grant["fence"]})["ok"])
+        observed = inspect_invariants(self.f.path, [{"receipts": [], "reasons": {"protected-effect-failed": 1}}])
+        self.assertEqual(observed["protected_writes"], 0)
+        self.assertEqual(observed["protected_effect_failures"], 1)
+        self.assertEqual(observed["violations"], ["protected-effect-failure"])
+        with sqlite3.connect(self.f.path) as db:
+            self.assertEqual(db.execute("SELECT count(*) FROM claims WHERE active=1").fetchone()[0], 0)
+
     def test_projection_outage_deduplication_and_out_of_order(self):
         self.f.intent()
         grant = self.f.claim()
