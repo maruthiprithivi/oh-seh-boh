@@ -1,6 +1,6 @@
 # Readiness audit and evidence gates
 
-Status: **source preview, unexecuted**. This audit targets OSB `61744a0850a2a9d6b843e22980973e9c3d3be44f` and PStack `5168f575f1ae6269850cb6dcd895e9b538bfc276`. The separate validation packet is an observer/test driver; it does not change those pinned implementations or authorize a deployment. The frozen first-run packet remains independently identified and unchanged.
+Status: **first bounded Linux slices passed; reference contention fairness failed**. This audit targets OSB `61744a0850a2a9d6b843e22980973e9c3d3be44f` and PStack `5168f575f1ae6269850cb6dcd895e9b538bfc276`. See the [2026-10-04 baseline receipt](linux-baseline.md) for exact scope: reference16, corrected-authority endpoint15 and actual installed-PStack4 passed. Subsequent independent/contention profiles and oracle controls had zero observed safety/live-claim violations, but contention failed Jain fairness >=0.5. The threshold remains unchanged; a scoped cooperative load-driver retry change awaits affected execution. Mutation controls, remaining profiles and owner full suites remain unrun. The consolidated validation job itself is still unexecuted and authorizes no deployment. The frozen first-run packet remains independently identified and unchanged.
 
 | Layer | Implemented source | What evidence can establish | Remaining gap |
 |---|---|---|---|

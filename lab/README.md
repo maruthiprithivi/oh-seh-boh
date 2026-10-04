@@ -1,6 +1,6 @@
 # Multi-team test project
 
-This directory is an executable **isolated reference lab**, not an operational coordination service. `osb.lab.v1` implements enough transitions to test OSB's model with real independent processes. Synthetic actors are injected by the test supervisor; any local caller can select a synthetic actor. It therefore cannot authenticate real users or enforce a real team's access. Use private disposable files only. Source is unexecuted until an authorized Linux allocation runs it.
+This directory is an executable **isolated reference lab**, not an operational coordination service. `osb.lab.v1` implements enough transitions to test OSB's model with real independent processes. Synthetic actors are injected by the test supervisor; any local caller can select a synthetic actor. It therefore cannot authenticate real users or enforce a real team's access. Use private disposable files only. Eleven correctness and five generic CI methods passed in the [2026-10-04 bounded Linux baseline](../docs/linux-baseline.md). Two short profiles had zero observed safety violations; contention failed its predeclared fairness gate. Saturation/soak remain unrun. The bounded conflict-backoff source change is unexecuted and creates no backend fairness queue.
 
 ## Progressive scenarios
 
@@ -19,7 +19,7 @@ This directory is an executable **isolated reference lab**, not an operational c
 
 The mock protected consumer writes inside the same SQLite transaction as its fence check. That tests a meaningful atomic boundary for the reference model; it is not proof that GitHub push, PR merge, CI or deployments have equivalent fencing. Integration effect records do not execute a forge merge.
 
-`ci_scenarios.py` adds four generic process-based CI coordination checks: declared base/head binding, release and retry after lost cancellation reply, obsolete session result and replay-key evidence substitution, and a competing migration-directory claim race. They are implemented but unexecuted. See [scope and missing real-CI capabilities](../docs/ci-coordination.md); these fixtures contain no incident data or inferred application failure causes.
+`ci_scenarios.py` adds four generic process-based CI coordination checks: declared base/head binding, release and retry after lost cancellation reply, obsolete session result and replay-key evidence substitution, and a competing migration-directory claim race, plus one result-classification fixture method. All five passed in the bounded baseline. See [scope and missing real-CI capabilities](../docs/ci-coordination.md); these fixtures contain no incident data or inferred application failure causes.
 
 ## Backend boundaries
 

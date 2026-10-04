@@ -27,6 +27,7 @@ def worker(db, actor, identity, barrier, output, count, mode, deadline, seed):
     engine = Engine(db)
     rng = random.Random(seed)
     latencies, waits, reasons, receipts, wins, retries = [], [], Counter(), [], 0, 0
+    conflict_retries, task_attempts = 0, 0
     barrier.wait(timeout=20)
 
     def call(operation, extra):
@@ -50,13 +51,30 @@ def worker(db, actor, identity, barrier, output, count, mode, deadline, seed):
     for index in range(count):
         if time.monotonic() >= deadline:
             break
+        task_attempts += 1
         task = actor + "-" + str(index)
         resources = [{"type": "directory", "name": "src/shared"}] if mode != "independent" else [
             {"type": "file", "name": "src/" + actor + "/" + str(index)}]
         if not call("intent", {"task": task, "resources": resources}).get("ok"):
             continue
         queue_start = time.perf_counter()
-        grant = call("claim", {"task": task, "expected_version": 1})
+        claim_request = {"task": task, "expected_version": 1, "request_id": str(uuid.uuid4())}
+        grant = call("claim", claim_request)
+        # A definitive conflict is not a lost acknowledgment. Keep the same
+        # intent/request and yield between bounded retries rather than burning
+        # the finite task budget while another worker owns the resource.
+        # Refusals remain in measured outcomes; this creates no fairness queue.
+        for attempt in range(8):
+            if grant.get("reason") != "scope-conflict":
+                break
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                break
+            time.sleep(min(remaining, rng.uniform(0.01, 0.05)))
+            if time.monotonic() >= deadline:
+                break
+            conflict_retries += 1
+            grant = call("claim", claim_request)
         if not grant.get("ok"):
             continue
         waits.append(time.perf_counter() - queue_start)
@@ -70,6 +88,7 @@ def worker(db, actor, identity, barrier, output, count, mode, deadline, seed):
     output.put({"actor": actor, "harness_label": HARNESSES[seed % len(HARNESSES)],
                 "simulated": True, "wins": wins, "latencies": latencies, "waits": waits,
                 "reasons": dict(reasons), "receipts": receipts, "busy_retries": retries,
+                "claim_conflict_retries": conflict_retries, "task_attempts": task_attempts,
                 "cpu_seconds": usage.ru_utime + usage.ru_stime, "max_rss_kib_linux": usage.ru_maxrss})
 
 
@@ -172,11 +191,17 @@ def main():
             "wall_seconds": elapsed, "task_attempt_ceiling": args.agents * args.operations_per_agent,
             "operations": len(latencies), "throughput_ops_per_second": len(latencies) / elapsed,
             "latency_seconds": {"p50": percentile(latencies, .50), "p95": percentile(latencies, .95), "p99": percentile(latencies, .99)},
-            "queue_wait_seconds": {"definition": "successful claim call elapsed, no fairness queue is implemented",
+            "queue_wait_seconds": {"definition": "successful claim acquisition elapsed including retries/backoff; no fairness queue is implemented",
                 "p50": percentile(waits, .50), "p95": percentile(waits, .95), "p99": percentile(waits, .99)},
             "jain_fairness_successful_claims": sum(wins) ** 2 / denominator if denominator else 0,
             "claims_per_actor": {r["actor"]: r["wins"] for r in results}, "outcomes": dict(reasons),
             "busy_retries": sum(r["busy_retries"] for r in results),
+            "claim_conflict_retries": sum(r["claim_conflict_retries"] for r in results),
+            "actual_task_attempts": sum(r["task_attempts"] for r in results),
+            "claim_retry_policy": {"version": "bounded-conflict-backoff-v1", "max_conflict_retries_per_task": 8,
+                "jitter_seconds": [0.01, 0.05], "deadline_shared": True,
+                "claim_calls_per_task_ceiling": 9,
+                "qualification": "changed cooperative workload; no backend fairness queue or starvation guarantee"},
             "cpu_seconds": sum(r["cpu_seconds"] for r in results),
             "max_worker_rss_kib_linux": max((r["max_rss_kib_linux"] for r in results), default=0),
             "database_bytes": fixture.path.stat().st_size, "journal_bytes": fixture.engine.journal.stat().st_size,

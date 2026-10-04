@@ -1,6 +1,6 @@
 # Validation status and reproducible plan
 
-Status at source publication: **unexecuted**. Independent source reviews refined repeated restore replay, operation-key scoping, lifecycle and permissions wording. Those reviews are not runtime tests. No passing metrics or capacity numbers are supplied.
+Status: **bounded first slices passed; reference contention fairness failed**. The [2026-10-04 baseline receipt](linux-baseline.md) reports 11 reference correctness and five generic CI methods, five actual endpoint plus ten lifecycle methods, and four installed-PStack cases. Raw logs/independent native-store observations were reviewed. Corrected authority results and the historical setup failure are distinct. Two short profiles and oracle controls were measured; contention failed its unchanged fairness gate. The scoped load-driver retry change, saturation/soak, mutation controls, full owner suites and offline-helper acceptance remain unexecuted. No production capacity result is supplied.
 
 The skill is OSB; the standalone reference test protocol is `osb.lab.v1`. The logical `osb/1` envelopes are adapter-review vocabulary. Neither claims compatibility with an installed harness or another service's wire API. Runtime validation belongs in a separately approved disposable Linux allocation; no provider/harness spend or live enrollment follows from these instructions.
 
@@ -24,6 +24,6 @@ Short allocation estimate: 10–15 minutes for this source/helper/scenario/profi
 
 Optional actual-endpoint delta: budget another 2–5 minutes on the same approved executor for the two [source smoke profiles](integration.md), provided its supervisor already supplies the exact clean owner checkout and Python/SQLite/bash/git. This estimate is unmeasured. It requires no VM, service or credentials beyond that existing allocation and disposable fixture. Pending capacity/quota/credit resolution does not authorize creating another allocation or executing on a developer workstation.
 
-The four [generic CI coordination scenarios](ci-coordination.md) add an estimated 2–5 minutes on that same executor, also unmeasured and unexecuted. Preserve all failures; success against synthetic reference transitions cannot certify real CI gates or diagnose an application's failed tests.
+The four [generic CI coordination scenarios](ci-coordination.md), plus a result-classification fixture method, passed as five reference methods in the baseline. Preserve all failures; success against synthetic reference transitions cannot certify real CI gates or diagnose an application's failed tests.
 
 Refinement loop: keep failed evidence, locate the invariant/measurement gap, make the narrow source correction, rerun affected scenarios plus relevant profiles on the approved executor, and compare only like-for-like baselines. Do not silently relax an invariant or call failed/partial runs successful to improve a graph.

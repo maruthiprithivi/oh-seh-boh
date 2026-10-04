@@ -1,6 +1,6 @@
 # Bounded CI coordination slice
 
-Four generic coordination scenarios and a bounded synthetic result-classification fixture are implemented in `lab/ci_scenarios.py` and **unexecuted**. They call actual independent OSB reference backend processes and inspect the disposable SQLite mock consumer. They contain no private incident data or inferred root causes. This slice changes no backend contract, deployed authority, workflow, credentials or harness configuration.
+Four generic coordination scenarios and a bounded synthetic result-classification fixture are implemented in `lab/ci_scenarios.py`. **All five methods passed** on the exact reference pin in the [2026-10-04 bounded Linux baseline](linux-baseline.md). They call actual independent OSB reference backend processes and inspect the disposable SQLite mock consumer. They contain no private incident data or inferred root causes. This slice changes no backend contract, deployed authority, workflow, credentials or harness configuration.
 
 | Priority | Scenario | Assertion | Limit |
 |---|---|---|---|
@@ -9,7 +9,7 @@ Four generic coordination scenarios and a bounded synthetic result-classificatio
 | 1 | Replacement session precedes an obsolete worker result | Old session refuses; new fence rises; exact duplicate is harmless; changing evidence under one request key refuses; hash of actual accepted mock-consumer bytes matches | Evidence is arbitrary synthetic content; no provider provenance verification or immutable artifact store |
 | 2 | Two writers choose different migrations in one namespace | Barrier race grants exactly one directory claim; other receives scope conflict | Coarse directory lock only: no numeric allocation, duplicate migration detection or application schema validation |
 
-Source-reviewed implementation is not passing evidence. On the same approved disposable Linux executor, run `python3 lab/ci_scenarios.py`, retaining command exit, complete output, source pin and environment versions alongside existing lab results. Estimate another 2–5 minutes, unmeasured. Capacity/credit blockage does not authorize another environment or paid service. This reference suite does not certify the actual `coord.project.v1` endpoint; its owner suites and adapter acceptance remain separate.
+The baseline retains actual passing logs; source review alone would not suffice. Future affected reruns use `python3 lab/ci_scenarios.py` only on an approved disposable Linux executor, retaining command exit, complete output, source pin and environment versions alongside existing lab results. No allocation follows from these instructions. This reference suite does not certify the actual `coord.project.v1` endpoint; its owner suites and adapter acceptance remain separate.
 
 Coordination can prevent overlapping compliant work and reject stale revisions or authority at a guarded consumer. It can preserve the exact failed result instead of allowing a replay key to rewrite it as passing. It cannot fix application test assertions, dependency failures, malformed configuration, provider outages, duplicate migration files already committed, or bypasses that never consult the guard. Record these as failures for the named owner; do not change them to green or authorize merge/deploy.
 
