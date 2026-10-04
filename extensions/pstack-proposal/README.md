@@ -1,0 +1,11 @@
+# Optional PStack → OSB source proposal
+
+PStack source reviewed at `cursor/plugins` commit `e43c7ee26e0038c6c1fa8380dd34ce86ff94cb2a` (plugin 0.15.9). [Upstream](https://github.com/cursor/plugins/tree/e43c7ee26e0038c6c1fa8380dd34ce86ff94cb2a/pstack) welcomes proposals. This isolated source area preserves all independent unpublished OSB deltas. No original orchestration code is modified or vendored; the proposed addition is a separate opt-in `pstack/skills/osb-coordination/` skill/client.
+
+Reviewed PStack `README.md`, orchestrate playbook, `scripts/orch/orch.ts`, lock/store interfaces and plugin manifest. The repository tree at that pin contained no applicable AGENTS.md, .agents/skills or contribution document; the unrelated Benny automation's FOR_AGENTS.md was not applied. Ancestor local AGENTS instructions require RTK command prefixes. Root plugin-validation workflow triggers on manifests/schema changes; this proposal changes neither. No contribution guard is bypassed; all local execution remains forbidden by the user's current source-only constraint.
+
+OSB stays independently maintained at [oh-seh-boh](https://github.com/maruthiprithivi/oh-seh-boh). PStack keeps local orchestration, head-keyed verification and its named stacker. The client connects only to a separately provisioned, compatible authority. Source fixtures can exercise a supervisor-supplied implementation without copying it into this public proposal. No production service, credentials, membership, SSH setup, installed harness or execution result is implied.
+
+PStack upstream is MIT, Copyright (c) 2026 Lauren Tan; see retained `LICENSE-PSTACK`. The PStack proposal is offered under its existing MIT terms. This does not choose or change the license of the independently maintained OSB repository, whose license decision remains unresolved. No existing OSB implementation source is copied into the PStack proposal.
+
+The helper enforces its own input/journal and refuses stale/unavailable authority responses. Its pre-effect checkpoint is cooperative; it cannot atomically fence a later direct Git/forge action. Claims are not merge/deploy/spend authorization. All new fixtures are unexecuted and the draft must say so.

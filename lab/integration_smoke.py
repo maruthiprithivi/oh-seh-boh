@@ -19,6 +19,9 @@ def main():
     parser.add_argument("--source", required=True, type=Path)
     parser.add_argument("--expected-source-commit", required=True)
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--profile", choices=("membership", "writer"), default="membership")
+    parser.add_argument("--capability-mapping", required=True,
+                        choices=("legacy-experimental", "osb-firstmate.coord.project.v2"))
     parser.add_argument("--test-only", required=True, action="store_true")
     args = parser.parse_args()
     source = args.source.resolve(strict=True)
@@ -41,6 +44,9 @@ def main():
         observations.append({"name": name, **result})
         return result
 
+    def observe(name, passed):
+        observations.append({"name": name, "passed": bool(passed)})
+
     with tempfile.TemporaryDirectory(prefix="osb-owner-integration-") as temp:
         db = str(Path(temp) / "ledger.sqlite3")
         for operation, payload in (("init", None), ("scope-create", {
@@ -58,7 +64,19 @@ def main():
             # Handles are fixed here by the supervisor, never derived from agent JSON.
             handles = {actor: [sys.executable, str(endpoint), db, actor] for actor in ("alice", "bob")}
             info = record("authority-info", invoke_existing_endpoint(handles["alice"], "authority-info", {}))
-            if info["granted"]:
+            discovery = info.get("receipt") or {}
+            has_authority = (isinstance(discovery, dict)
+                             and isinstance(discovery.get("authority_id"), str)
+                             and bool(discovery["authority_id"]))
+            if args.capability_mapping == "osb-firstmate.coord.project.v2":
+                mapping_matches = (info["granted"] and has_authority and discovery.get("protocol") == "coord.project.v1"
+                    and type(discovery.get("schema_version")) is int and discovery["schema_version"] == 10
+                    and discovery.get("capability_profile") == "firstmate.scoped.v2")
+            else:
+                mapping_matches = (info["granted"] and has_authority and discovery.get("protocol") == "coord.project.v1"
+                    and "schema_version" not in discovery and "capability_profile" not in discovery)
+            observe("capability-mapping-matches", mapping_matches)
+            if mapping_matches:
                 authority = info["receipt"]["authority_id"]
                 status = record("scope-status", invoke_existing_endpoint(handles["alice"], "scope-status", {"scope_id": "synthetic-project"}))
                 if status["granted"]:
@@ -73,16 +91,35 @@ def main():
                     # Stale authority is sent directly so the framing layer does not fix it.
                     wrong = {**join, "request_id": str(uuid.uuid4()), "authority_id": "stale-authority"}
                     denied = record("stale-authority", invoke_existing_endpoint(handles["bob"], "scope-join", wrong))
-                    observations.append({"name": "stale-authority-refused", "passed": not denied["granted"]})
+                    observe("stale-authority-refused", denied["exit"] == 1 and denied["receipt"] is None
+                            and denied["stderr"].strip() == "fm-coord: stale authority identity; rediscover after fenced recovery")
+                    if args.profile == "writer":
+                        from owner_writer_smoke import run_writer_smoke
+                        try:
+                            run_writer_smoke(handles, authority, epoch, record, observe,
+                                             v2=args.capability_mapping == "osb-firstmate.coord.project.v2")
+                        except (KeyError, TypeError, ValueError, OSError, subprocess.SubprocessError) as error:
+                            observations.append({"name": "writer-profile-incomplete", "passed": False,
+                                                 "error_type": type(error).__name__})
     passed = all(row.get("passed", True) for row in observations)
     required = {"authority-info", "scope-status", "scope-invite", "scope-join", "scope-join-replay"}
     completed = {row["name"] for row in observations if row.get("granted")}
     passed = passed and required <= completed and all(row.get("exit", 0) == 0 for row in observations if row["name"] in ("init", "scope-create"))
+    passed = passed and any(row["name"] == "capability-mapping-matches" and row.get("passed") for row in observations)
+    if args.profile == "writer":
+        writer_checks = {"claim-replay-identical", "overlapping-writer-refused", "claim-check-matches",
+                         "renew-extends-lease", "released-claim-refused", "denial-replay-identical",
+                         "successor-fence-increases", "revoked-claim-refused", "revocation-before-replay"}
+        passed = passed and writer_checks <= {row["name"] for row in observations if row.get("passed")}
+        if args.capability_mapping == "osb-firstmate.coord.project.v2":
+            passed = passed and any(row["name"] == "v2-check-head-field" and row.get("passed") for row in observations)
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps({"source_commit": actual, "status": "passed" if passed else "failed-or-incomplete",
+    with args.output.open("x") as output:
+        output.write(json.dumps({"source_commit": actual, "profile": args.profile,
+        "capability_mapping": args.capability_mapping, "status": "passed" if passed else "failed-or-incomplete",
         "synthetic_principals": True, "real_ssh_binding_proven": False,
         "scope": "disposable-source-fixture", "observations": observations,
-        "limits": "membership/framing smoke only; owner claim/restore/adapter suites still required"}, indent=2) + "\n")
+        "limits": "bounded synthetic source smoke only; owner concurrency/load/restore and deployed transport suites still required"}, indent=2) + "\n")
     return 0 if passed else 1
 
 

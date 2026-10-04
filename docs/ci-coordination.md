@@ -1,0 +1,32 @@
+# Bounded CI coordination slice
+
+Four generic coordination scenarios and a bounded synthetic result-classification fixture are implemented in `lab/ci_scenarios.py` and **unexecuted**. They call actual independent OSB reference backend processes and inspect the disposable SQLite mock consumer. They contain no private incident data or inferred root causes. This slice changes no backend contract, deployed authority, workflow, credentials or harness configuration.
+
+| Priority | Scenario | Assertion | Limit |
+|---|---|---|---|
+| 1 | A result carries a different declared base or head | Mock consumer refuses both; one matching write remains | No live forge read: a changed remote base must be detected by the real adapter |
+| 1 | Cancellation modeled as releasing ownership, with lost reply and retry | Original release receipt replays; fresh check and late write refuse; successor claim survives old release replay and fresh old release/completion; successor writes/releases normally | Does not cancel a CI provider run; cached success is historical, not current authority |
+| 1 | Replacement session precedes an obsolete worker result | Old session refuses; new fence rises; exact duplicate is harmless; changing evidence under one request key refuses; hash of actual accepted mock-consumer bytes matches | Evidence is arbitrary synthetic content; no provider provenance verification or immutable artifact store |
+| 2 | Two writers choose different migrations in one namespace | Barrier race grants exactly one directory claim; other receives scope conflict | Coarse directory lock only: no numeric allocation, duplicate migration detection or application schema validation |
+
+Source-reviewed implementation is not passing evidence. On the same approved disposable Linux executor, run `python3 lab/ci_scenarios.py`, retaining command exit, complete output, source pin and environment versions alongside existing lab results. Estimate another 2–5 minutes, unmeasured. Capacity/credit blockage does not authorize another environment or paid service. This reference suite does not certify the actual `coord.project.v1` endpoint; its owner suites and adapter acceptance remain separate.
+
+Coordination can prevent overlapping compliant work and reject stale revisions or authority at a guarded consumer. It can preserve the exact failed result instead of allowing a replay key to rewrite it as passing. It cannot fix application test assertions, dependency failures, malformed configuration, provider outages, duplicate migration files already committed, or bypasses that never consult the guard. Record these as failures for the named owner; do not change them to green or authorize merge/deploy.
+
+For a real CI gate, a reviewed capability mapping must bind immutable forge/repository identity, task and resource scope, current authority/membership/session/fence, base ref and exact base/head OIDs, provider run identity plus attempt, workflow/config revision, artifact digest and final outcome. Re-read authoritative revisions before the protected effect and invalidate obsolete attempts. A task claim, a green status and an evidence URL are individually insufficient. These fields are an adapter review requirement, not newly implemented validation in this lab.
+
+An incident crosswalk, if supplied, stays private: verified observation → generic failure class → applicable assertion → unsupported boundary → required owner action. Retain observation/source provenance there; publish only generic fixtures. Do not label any scenario an actual incident reproduction until its verified trigger and invariant have been mapped, and do not claim a root cause from a failed CI badge alone.
+
+## Research recommendation gap matrix
+
+| Requirement | Current source coverage | Gap and next evidence needed |
+|---|---|---|
+| Exact revision evidence | Reference backend compares declared base/head inside its SQLite mock protected-write transaction; tests vary each separately and include coherent positive control | No live revision advancement or author/reviewer/dispatcher pipeline. Synthetic merge tree, event base, admission base, attempt and digest are not distinct authority fields. Independent append-only effect oracle and guard-removal mutation control remain absent |
+| Cancellation/replay | Backend restarts as a new subprocess on every invocation; crash-after-commit replay plus successor fence/check/write/release controls are present | No actual cancel operation or external ownership inventory/cleanup API. Missing inventory refusal and preservation of foreign external resources are unsupported, not implied by release |
+| Obsolete result/digest | Backend session check and replay digest reject stale session and changed bytes; normal mock consumer supplies accepted bytes for hash and exact duplicate control | No provider-run binding, published digest validation, distinct head-change pipeline or external append-only effect oracle. Stored synthetic bytes are not verified CI evidence |
+| Migration namespace | Concurrent clients/barrier claim shared logical directory; one active claim and one explicit conflict required | No disposable Git publication/schema refresh, alias normalization, ancestor/descendant/future-file matrix or case policy test in this slice. File-lock-only mutation control and loser progress after schema refresh remain absent. Directory exclusion is not database migration atomicity |
+| Result classification | Synthetic fixtures distinguish `notexecuted`, `setupfailed`, `cancelled`, `behaviorfailure`, `pass`; expected RED requires compilation and observed intended assertion | Supplied booleans are supervisor fixture inputs, not extracted or verified logs. No failure automatically proves a guard. Actual trace collection/classification and mutation controls still require approved execution |
+
+`result_classification.py` and `ci_result_fixtures.json` test the reporting convention only. A coordination scenario passing is distinct from an application returning green: an expected, verified RED assertion can make a negative-control scenario pass, while a compile failure before the assertion cannot. Deliberately batching CI triggers can be an explicit workflow policy; do not classify that choice as a missing coordination feature.
+
+Keep result layers separate: reference backend, optional actual owner endpoint adapter, and real installed harness. No test result at one layer fills the gaps at another. This matrix bounds the next work rather than introducing missing production operations merely to pass a model.

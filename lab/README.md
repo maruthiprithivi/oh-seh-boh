@@ -19,6 +19,8 @@ This directory is an executable **isolated reference lab**, not an operational c
 
 The mock protected consumer writes inside the same SQLite transaction as its fence check. That tests a meaningful atomic boundary for the reference model; it is not proof that GitHub push, PR merge, CI or deployments have equivalent fencing. Integration effect records do not execute a forge merge.
 
+`ci_scenarios.py` adds four generic process-based CI coordination checks: declared base/head binding, release and retry after lost cancellation reply, obsolete session result and replay-key evidence substitution, and a competing migration-directory claim race. They are implemented but unexecuted. See [scope and missing real-CI capabilities](../docs/ci-coordination.md); these fixtures contain no incident data or inferred application failure causes.
+
 ## Backend boundaries
 
 One host-local lock and SQLite database serialize requests. A one-second lock wait returns `busy`; clients keep request IDs and retry twice with backoff. Payloads are bounded to 64 KiB, resources to 100 entries, pages to 100, test workers to 64 and total task attempts to 20,000. Pending projection events have a configurable ceiling; new workload mutations backpressure, while read/revoke/release/ack remain available. Safety-event growth is not silently dropped.
@@ -35,6 +37,7 @@ Only run in an approved disposable Linux environment. No source creation authori
 
 ```sh
 python3 lab/scenarios.py
+python3 lab/ci_scenarios.py
 python3 lab/load.py --test-only --profile independent --agents 8 --operations-per-agent 30 --seconds 30 --output evidence/independent.json
 python3 lab/load.py --test-only --profile contention --agents 16 --operations-per-agent 50 --seconds 60 --output evidence/contention.json
 python3 lab/load.py --test-only --profile saturation --agents 8 --operations-per-agent 50 --max-pending 50 --seconds 30 --output evidence/saturation.json

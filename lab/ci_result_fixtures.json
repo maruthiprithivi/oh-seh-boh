@@ -1,0 +1,10 @@
+[
+  {"name":"not-run","observation":{},"expected":{"state":"notexecuted","expected_red_proof":false}},
+  {"name":"fixture-setup-failed","observation":{"started":true,"setup_ok":false},"expected":{"state":"setupfailed","expected_red_proof":false}},
+  {"name":"cancelled","observation":{"started":true,"setup_ok":true,"cancelled":true},"expected":{"state":"cancelled","expected_red_proof":false}},
+  {"name":"compile-failure-before-assertion","observation":{"started":true,"setup_ok":true,"compiled":false,"test_exit":1,"behavior_ok":false},"expected":{"state":"behaviorfailure","expected_red_proof":false}},
+  {"name":"unrelated-assertion-failure","observation":{"started":true,"setup_ok":true,"compiled":true,"test_exit":1,"expected_assertion_observed":false,"behavior_ok":false},"expected":{"state":"behaviorfailure","expected_red_proof":false}},
+  {"name":"expected-red-assertion-confirmed","observation":{"started":true,"setup_ok":true,"compiled":true,"test_exit":1,"expected_assertion_observed":true,"behavior_ok":true},"expected":{"state":"pass","expected_red_proof":true}},
+  {"name":"ordinary-green","observation":{"started":true,"setup_ok":true,"compiled":true,"test_exit":0,"expected_assertion_observed":false,"behavior_ok":true},"expected":{"state":"pass","expected_red_proof":false}},
+  {"name":"boolean-exit-is-not-an-exit-code","observation":{"started":true,"setup_ok":true,"compiled":true,"test_exit":true,"expected_assertion_observed":true,"behavior_ok":true},"expected":{"state":"pass","expected_red_proof":false}}
+]

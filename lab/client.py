@@ -28,6 +28,8 @@ def invoke_existing_endpoint(client_handle, operation, payload, timeout=5):
     Do not derive principal/DB from task JSON. Client handle is trusted isolated
     fixture configuration or an already approved fixed authenticated route.
     This only frames coord.project.v1; it proves neither compatibility nor SSH.
+    The historical `granted` field means exit0 plus ok:true only: it is not
+    claim authority or CI admission. A queued admitted:false receipt may be ok.
     """
     envelope = {"protocol": "coord.project.v1", "operation": operation, "payload": payload}
     encoded = json.dumps(envelope)
