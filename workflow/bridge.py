@@ -13,6 +13,7 @@ def apply_prepared(db, config, key, owner_bridge):
 
     Bridge contract:
       dispatcher and authority_profile equal immutable operator config;
+      supported_operations is an explicitly reviewed capability set;
       authorize_current(envelope) -> True only after authenticated live read;
       apply(envelope) -> {'status': confirmed|refused|unknown, 'receipt': dict}.
 
@@ -29,6 +30,9 @@ def apply_prepared(db, config, key, owner_bridge):
     if len(rows) != 1 or rows[0]["status"] != "pending":
         raise Refusal("intent-must-reconcile-before-repeat")
     e = validate(rows[0]["envelope"], config)
+    operations = getattr(owner_bridge, "supported_operations", None)
+    if not isinstance(operations, (set, frozenset)) or e["operation"] not in operations:
+        raise Refusal("owner-capability-unavailable")
     if owner_bridge.authorize_current(e) is not True: raise Refusal("current-authorization-refused")
     db.execute("BEGIN IMMEDIATE")
     with db: e = start(db, config, key)

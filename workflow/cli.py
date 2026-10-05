@@ -13,6 +13,7 @@ from workflow.admission import evaluate
 from workflow.contract import Refusal, canonical, check_config, envelope, next_action
 from workflow.journal import install, prepare, observe, pending
 from workflow.notifications import ProjectACL, poll_pending
+from workflow.handoff import checkpoint, accept_intent, resume_decision
 
 
 def _pairs(pairs):
@@ -63,6 +64,9 @@ def main():
     env = subs.add_parser("envelope"); env.add_argument("--task", required=True); env.add_argument("--operation", required=True); env.add_argument("--payload", required=True)
     prep = subs.add_parser("prepare"); prep.add_argument("--journal", required=True); prep.add_argument("--envelope", required=True)
     rec = subs.add_parser("record-observation"); rec.add_argument("--journal", required=True); rec.add_argument("--key", required=True); rec.add_argument("--status", choices=["confirmed", "refused", "unknown"], required=True); rec.add_argument("--receipt", required=True)
+    hand = subs.add_parser("checkpoint"); hand.add_argument("--task", required=True); hand.add_argument("--claim", required=True); hand.add_argument("--delta", required=True); hand.add_argument("--mode", choices=["pause", "offer"], required=True); hand.add_argument("--to"); hand.add_argument("--offer-id")
+    accept = subs.add_parser("handoff-accept"); accept.add_argument("--packet", required=True); accept.add_argument("--preflight", required=True)
+    resume = subs.add_parser("handoff-resume"); resume.add_argument("--packet", required=True); resume.add_argument("--receipt", required=True); resume.add_argument("--current", required=True)
     args = parser.parse_args()
     try:
         c = read(args.config); check_config(c)
@@ -70,6 +74,9 @@ def main():
         elif args.command == "admit":
             result = admit_snapshot(c, read(args.snapshot))
         elif args.command == "envelope": result = envelope(c, read(args.task), args.operation, read(args.payload))
+        elif args.command == "checkpoint": result = checkpoint(c, read(args.task), read(args.claim), read(args.delta), mode=args.mode, to=args.to, offer_id=args.offer_id)
+        elif args.command == "handoff-accept": result = accept_intent(c, read(args.packet), read(args.preflight))
+        elif args.command == "handoff-resume": result = resume_decision(c, read(args.packet), read(args.receipt), read(args.current))
         else:
             db = connect(args.journal, args.command == "init-journal")
             try:

@@ -11,7 +11,7 @@ PROTOCOL = "osb.factory.intent.v1"
 DISPATCHERS = {"firstmate", "claude-code", "codex", "omp", "opencode"}
 PROFILES = {"transactional", "github-cas-cooperative"}
 OPERATIONS = {"claim", "dispatch", "review", "fix", "verify", "landing",
-              "release", "reconcile", "update-backlog"}
+              "release", "reconcile", "update-backlog", "handoff-accept"}
 ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}\Z")
 OID = re.compile(r"(?:[0-9a-f]{40}|[0-9a-f]{64})\Z")
 
@@ -61,6 +61,9 @@ def envelope(config, task, operation, payload):
     # Key scopes one immutable intent; altered bytes with this key must conflict in journal/authority.
     key_material = [config["project"], config["repo_id"], config["authority"],
                     config["run"], config["principal"], task, operation]
+    if operation == "handoff-accept":
+        if not identifier(payload.get("offer_id")): raise Refusal("authority-approved-offer-id-required")
+        key_material.append(payload["offer_id"])
     key = hashlib.sha256(canonical(key_material).encode()).hexdigest()
     result = {"protocol": PROTOCOL, "project": config["project"], "repo_id": config["repo_id"],
               "principal": config["principal"], "authority": dict(config["authority"]),

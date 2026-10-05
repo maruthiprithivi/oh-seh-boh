@@ -115,6 +115,10 @@ pinned dispatcher/profile, live `authorize_current`, and an effect-specific `app
 mapping. A live read alone is not a fence: `apply` must use existing atomic authority
 claim/admission and protected effect preconditions. No generic bridge becomes
 qualified merely by returning True or implementing these names.
+The bridge must also declare a reviewed `supported_operations` set. Unsupported
+operations refuse before invocation. In particular, the inspected Firstmate-backed
+PStack adapter currently has no generic handoff acceptance mapping; pure handoff
+fixture logic does not establish that production capability.
 
 The helper commits `started` before the one owner call. Crash/lost response means
 uncertainty, never automatic dispatch repeat. An unknown result is retained and
@@ -129,6 +133,10 @@ requires a consumer that validates ownership atomically with its protected write
 and Cloudflare transport seams. Local workflow intents/outbox are one transaction;
 a remote authority needs its own owner-side transactional outbox, not a local mirror.
 See [transport contract](transport-contract.md). No service or transport is deployed.
+
+[Delta handoff policy](handoff-contract.md) adds concise checkpoint/offer/preflight
+commands. Pause retains ownership; transfer requires existing controller quiescence,
+atomic owner acceptance and a live successor read. It introduces no second backlog.
 
 ## Qualification and next milestones
 

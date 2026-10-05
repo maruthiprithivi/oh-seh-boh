@@ -17,6 +17,12 @@ at its historical exact pins. No merge, deployment or installation occurred.
 3. Corrected narrow PStack provenance and authored two additional native cases
    without modifying frozen runner/helpers. Broader factory qualification does not
    automatically become a plugin merge blocker.
+4. Added bounded delta handoff policy/CLI sources inspired by read-only BatonPass
+   inspection: pause versus offer, receiver preflight, approved offer identity,
+   predecessor quiescence, atomic acceptance intent and live successor checks.
+   The inspected production adapter does not support generic acceptance; the bridge
+   explicitly refuses absent capabilities. Logical fixture acceptance is not an
+   available production transition. This completes the source freeze before GCP.
 
 The base checkout was clean on `source/factory-contract-and-outbox`, derived from
 `f40a652d77c66831c3423ac6f10cacfb5a9ad647`. The prior branch and `task-2`

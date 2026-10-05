@@ -10,6 +10,7 @@ from workflow.tests.test_contract import config, task
 class OwnerFixture:
     dispatcher = "firstmate"
     authority_profile = "transactional"
+    supported_operations = frozenset({"claim"})
     def __init__(self, db, outcome="confirmed"):
         self.db = db; self.outcome = outcome; self.calls = []
     def authorize_current(self, e):
@@ -49,6 +50,14 @@ class BridgeTests(unittest.TestCase):
         owner = OwnerFixture(self.db)
         owner.authorize_current = lambda e: False
         with self.assertRaises(Refusal): apply_prepared(self.db, self.c, self.e["key"], owner)
+        self.assertEqual(owner.calls, [])
+
+    def test_missing_handoff_capability_refuses_without_invented_transition(self):
+        e = envelope(self.c, task(), "handoff-accept", {"offer_id": "offer-1"})
+        self.db.execute("BEGIN IMMEDIATE")
+        with self.db: prepare(self.db, self.c, e)
+        owner = OwnerFixture(self.db)
+        with self.assertRaises(Refusal): apply_prepared(self.db, self.c, e["key"], owner)
         self.assertEqual(owner.calls, [])
 
 

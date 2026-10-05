@@ -22,6 +22,10 @@ Use `admit` for bounded ready candidates, `envelope` then `prepare` for immutabl
 intents, `decide` for the next scoped recommendation, and `pending` to find unresolved
 outcomes. Read [transport contract](../../workflow/transport-contract.md) only when
 configuring notifications. Queue messages and GitHub projections never grant work.
+For pause or transfer, read [delta handoff](../../workflow/handoff-contract.md) and
+use `checkpoint`, `handoff-accept`, `handoff-resume`. An offer or document acknowledgment
+does not transfer ownership; existing authority acceptance and controller quiescence
+must be verified before resuming.
 
 On uncertain outcomes, preserve the journal and consult the current authority by
 original key plus the existing dispatcher/native effect journal. A saved started
