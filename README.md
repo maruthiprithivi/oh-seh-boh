@@ -20,6 +20,13 @@ The [readiness audit](docs/readiness.md) separates reference behavior, actual au
 
 ## Use the skill
 
+An [optional factory source preview](workflow/README.md) adds deterministic backlog
+admission, immutable workflow intents, an owner-bridge boundary and transactional
+notification polling with optional transport seams. Its [short skill entry](skills/osb-factory/SKILL.md)
+points to the reusable CLI. All new sources and native gap cases are **UNRUN**;
+[GCP qualification](docs/factory-gcp-validation.md) is separate. The authority core
+and existing Firstmate/PStack/Breakfree lifecycle ownership are preserved.
+
 Read [SKILL.md](skills/osb/SKILL.md) directly, or copy the full `skills/osb` folder into one approved skill root for your harness. See the [documented compatibility matrix](skills/osb/references/compatibility.md). Documentation support is separate from installed-version verification; `omp` and `agy` identities must be confirmed.
 
 The usable minimal workflow is [cooperative GitHub setup](skills/osb/references/quickstart.md): verify repository/human identities, prepare a control issue and task/config drafts, publish them only within authorization, and let the named human integration owner acknowledge grants, handovers and releases. Issues provide visibility; comments and labels are not atomic locks.
